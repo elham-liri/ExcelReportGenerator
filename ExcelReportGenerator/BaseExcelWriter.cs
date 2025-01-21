@@ -1,20 +1,26 @@
 ﻿using System.Collections;
 using ExcelReportGenerator.ExcelEntities;
 using ExcelReportGenerator.Interfaces;
+using OfficeOpenXml;
 
 namespace ExcelReportGenerator
 {
     public abstract class BaseExcelWriter
     {
+        protected BaseExcelWriter()
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        }
+
         public abstract bool CellValueIsNumber(object value);
         public abstract string PrepareEnumValueToShow(object value);
         public abstract string PrepareDateTimeValueToShow(object value, IDateTimeProperties properties);
         public abstract string PrepareNumberValueToShow(object value, INumberProperties properties);
 
-        public virtual List<ExcelRow> CreateExcelRows<T>(IEnumerable<T> dataList, List<IExcelColumn> columns)
+        public virtual List<ExcelReportRow> CreateExcelRows<T>(IEnumerable<T> dataList, List<IExcelColumn> columns)
             where T : class, IExcelData
         {
-            var rows = new List<ExcelRow>();
+            var rows = new List<ExcelReportRow>();
             var type = typeof(T);
 
             var displayNormalColumns = columns
@@ -30,13 +36,13 @@ namespace ExcelReportGenerator
             foreach (var item in dataList)
             {
                 var id = type.GetProperty("Id")?.GetValue(item);
-                var row = new ExcelRow() { Id = id };
+                var row = new ExcelReportRow() { Id = id };
                 foreach (var column in displayNormalColumns)
                 {
                     var property = type.GetProperty(FirstCharToUpper(column.Name));
                     if (property == null)
                     {
-                        row.Cells.Add(new ExcelCell() { Order = column.Order, Value = string.Empty });
+                        row.Cells.Add(new ExcelReportCell() { Order = column.Order, Value = string.Empty });
                         continue;
                     }
 
@@ -58,7 +64,7 @@ namespace ExcelReportGenerator
                         value = PrepareNumberValueToShow(value, column.DataProperties.NumberProperties);
                     }
 
-                    row.Cells.Add(new ExcelCell() { Order = column.Order, Value = value });
+                    row.Cells.Add(new ExcelReportCell() { Order = column.Order, Value = value });
                 }
 
                 if (displayDynamicColumns.Any())
@@ -81,7 +87,7 @@ namespace ExcelReportGenerator
                             var val = value.Value;
                             if (val == null)
                             {
-                                row.Cells.Add(new ExcelCell() { Order = column.Order, Value = string.Empty });
+                                row.Cells.Add(new ExcelReportCell() { Order = column.Order, Value = string.Empty });
                                 continue;
                             }
 
@@ -92,7 +98,7 @@ namespace ExcelReportGenerator
                                 val = PrepareDateTimeValueToShow(value, column.DataProperties.DateTimeProperties);
                             }
 
-                            row.Cells.Add(new ExcelCell() { Order = column.Order, Value = val });
+                            row.Cells.Add(new ExcelReportCell() { Order = column.Order, Value = val });
                         }
                     }
                 }
@@ -101,7 +107,7 @@ namespace ExcelReportGenerator
                 if (horizontal != null)
                 {
                     var value = type.GetProperty(FirstCharToUpper(horizontal.Name))?.GetValue(item);
-                    row.HorizontalCells.Add(new ExcelCell() { Order = horizontal.Order, Value = value });
+                    row.HorizontalCells.Add(new ExcelReportCell() { Order = horizontal.Order, Value = value });
                 }
 
                 rows.Add(row);
