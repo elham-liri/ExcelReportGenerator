@@ -2,20 +2,20 @@
 {
     public interface IBaseExcelProfile
     {
-        List<IExcelColumn> Columns { get; set; }
+        List<IExcelReportColumn> Columns { get; set; }
         IExcelProfileDefaultProperties? DefaultProperties { get; set; }
         IExcelProfileCellStyle? CellStyle { get; set; }
         IExcelProfileHeaderStyle? HeaderStyle { get; set; }
         IExcelProfileTotalSumStyle? TotalSumStyle { get; set; }
 
         void InitializeColumns();
-        void ResetColumns(IEnumerable<IExcelColumn> columns);
+        void ResetColumns(IEnumerable<IExcelReportColumn> columns);
         void SetDefaultProperties();
         void SetHeaderStyle();
         void SetTotalSumStyle();
         void SetCellStyle();
-        void AddDynamicColumns(IEnumerable<IExcelColumn> dynamicColumns);
-        List<IExcelColumn> GetDisplayedVerticalColumns();
-        List<IExcelColumn> GetDisplayedHorizontalColumns();
+        void AddDynamicColumns(IEnumerable<IExcelReportColumn> dynamicColumns);
+        List<IExcelReportColumn> GetDisplayedVerticalColumns();
+        List<IExcelReportColumn> GetDisplayedHorizontalColumns();
     }
 }

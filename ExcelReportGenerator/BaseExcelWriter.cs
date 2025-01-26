@@ -17,7 +17,7 @@ namespace ExcelReportGenerator
         public abstract string PrepareDateTimeValueToShow(object value, IDateTimeProperties properties);
         public abstract string PrepareNumberValueToShow(object value, INumberProperties properties);
 
-        public virtual List<ExcelReportRow> CreateExcelRows<T>(IEnumerable<T> dataList, List<IExcelColumn> columns)
+        public virtual List<ExcelReportRow> CreateExcelRows<T>(IEnumerable<T> dataList, List<IExcelReportColumn> columns)
             where T : class, IExcelData
         {
             var rows = new List<ExcelReportRow>();
@@ -39,7 +39,7 @@ namespace ExcelReportGenerator
                 var row = new ExcelReportRow() { Id = id };
                 foreach (var column in displayNormalColumns)
                 {
-                    var property = type.GetProperty(FirstCharToUpper(column.Name));
+                    var property = type.GetProperty(column.Name.FirstCharToUpper());
                     if (property == null)
                     {
                         row.Cells.Add(new ExcelReportCell() { Order = column.Order, Value = string.Empty });
@@ -106,7 +106,7 @@ namespace ExcelReportGenerator
 
                 if (horizontal != null)
                 {
-                    var value = type.GetProperty(FirstCharToUpper(horizontal.Name))?.GetValue(item);
+                    var value = type.GetProperty(horizontal.Name.FirstCharToUpper())?.GetValue(item);
                     row.HorizontalCells.Add(new ExcelReportCell() { Order = horizontal.Order, Value = value });
                 }
 
@@ -117,12 +117,69 @@ namespace ExcelReportGenerator
 
         }
 
-        private static string FirstCharToUpper(string input)
+        public ExcelReportRow CreateTotalSumRow<T>( T model, List<IExcelReportColumn> columns)
+            where T : class, IExcelTotalDataModel
         {
-            if (string.IsNullOrEmpty(input))
-                return string.Empty;
-            return input.First().ToString().ToUpper() + string.Join("", input.Skip(1));
+            var row = new ExcelReportRow();
+            var type = typeof(T);
+
+            var columnsWithTotal = columns.Where(a => !a.Excluded && !a.IsHorizontal && a.HasTotalSum)
+                .OrderBy(a => a.Order)
+                .ToList();
+
+            foreach (var column in columnsWithTotal)
+            {
+                var desiredName = $"Total{column.Name.FirstCharToUpper()}";
+                var property = type.GetProperty(desiredName);
+                if (property == null)
+                {
+                    row.Cells.Add(new ExcelReportCell() { Order = column.Order, Value = string.Empty });
+                    continue;
+                }
+
+                var value = property.GetValue(model);
+                var propertyType = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
+
+
+                if (propertyType.IsEnum && value != null)
+                {
+                    value = PrepareEnumValueToShow(value);
+                }
+
+                row.Cells.Add(new ExcelReportCell() { Order = column.Order, Value = value });
+            }
+
+            return row;
         }
 
+        public byte[] GenerateExcelReport<T>(ISingleSheetExcelRequest<T> request) 
+            where T : class, IExcelData
+        {
+            var excelRows = CreateExcelRows(request.DataList, request.ExcelProfile.Columns);
+
+            using var package = new ExcelPackage();
+            var sheet = package
+                .CreateSheet(request.SheetName)
+                .SetSheetDefaults(request.ExcelProfile.DefaultProperties); 
+
+            return package.GetAsByteArray();
+        }
+
+        public byte[] GenerateExcelReport<T,TN>(ISingleSheetExcelRequestWithTotalRow<T,TN> request) 
+            where T : class, IExcelData 
+            where TN : class, IExcelTotalDataModel
+        {
+            var excelRows = CreateExcelRows(request.DataList, request.ExcelProfile.Columns);
+            var totalSumRow = CreateTotalSumRow(request.TotalDataModel, request.ExcelProfile.Columns);
+
+            using var package = new ExcelPackage();
+            var sheet = package
+                .CreateSheet(request.SheetName)
+                .SetSheetDefaults(request.ExcelProfile.DefaultProperties)
+                .AddHeaderRow(request.ExcelProfile);
+            
+            
+            return package.GetAsByteArray();
+        }
     }
 }

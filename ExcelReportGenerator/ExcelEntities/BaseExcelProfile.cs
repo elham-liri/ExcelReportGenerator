@@ -4,7 +4,7 @@ namespace ExcelReportGenerator.ExcelEntities
 {
     public abstract class BaseExcelProfile:IBaseExcelProfile
     {
-        public List<IExcelColumn> Columns { get; set; } = null!;
+        public List<IExcelReportColumn> Columns { get; set; } = null!;
         public IExcelProfileDefaultProperties? DefaultProperties { get; set; }
         public IExcelProfileCellStyle? CellStyle { get; set; }
         public IExcelProfileHeaderStyle? HeaderStyle { get; set; }
@@ -12,7 +12,7 @@ namespace ExcelReportGenerator.ExcelEntities
 
         public abstract void InitializeColumns();
 
-        public virtual void ResetColumns(IEnumerable<IExcelColumn> columns)
+        public virtual void ResetColumns(IEnumerable<IExcelReportColumn> columns)
         {
             Columns = columns.ToList();
         }
@@ -37,7 +37,7 @@ namespace ExcelReportGenerator.ExcelEntities
             CellStyle=new ExcelProfileCellStyle();
         }
 
-        public virtual void AddDynamicColumns(IEnumerable<IExcelColumn> dynamicColumns)
+        public virtual void AddDynamicColumns(IEnumerable<IExcelReportColumn> dynamicColumns)
         {
             dynamicColumns = dynamicColumns.OrderBy(a => a.Order);
             var existedColumnsCount = Columns.Count;
@@ -49,12 +49,12 @@ namespace ExcelReportGenerator.ExcelEntities
             }
         }
 
-        public List<IExcelColumn> GetDisplayedVerticalColumns()
+        public List<IExcelReportColumn> GetDisplayedVerticalColumns()
         {
             return Columns.Where(a => !a.Excluded && !a.IsHorizontal).OrderBy(a => a.Order).ToList();
         }
 
-        public List<IExcelColumn> GetDisplayedHorizontalColumns()
+        public List<IExcelReportColumn> GetDisplayedHorizontalColumns()
         {
             return Columns.Where(a => !a.Excluded && a.IsHorizontal).OrderBy(a => a.Order).ToList(); 
         }

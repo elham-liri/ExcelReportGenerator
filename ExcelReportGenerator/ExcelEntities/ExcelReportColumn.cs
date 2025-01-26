@@ -2,14 +2,15 @@
 
 namespace ExcelReportGenerator.ExcelEntities
 {
-    public class ExcelColumn : IExcelColumn
+    public class ExcelReportColumn : IExcelReportColumn
     {
-        public ExcelColumn()
+        public ExcelReportColumn()
         {
             DataProperties = new ExcelColumnDataProperties();
         }
 
         public string Name { get; set; } = null!;
+        public string NameToShow { get; set; }
         public int Order { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }

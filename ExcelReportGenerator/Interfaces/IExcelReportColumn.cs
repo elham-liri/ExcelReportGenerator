@@ -1,8 +1,9 @@
 ﻿namespace ExcelReportGenerator.Interfaces
 {
-    public interface IExcelColumn
+    public interface IExcelReportColumn
     {
-        public string Name { get; set; } 
+        public string Name { get; set; }
+        public string NameToShow { get; set; }
         public int Order { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
