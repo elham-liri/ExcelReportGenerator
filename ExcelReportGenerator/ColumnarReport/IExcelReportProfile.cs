@@ -11,6 +11,11 @@
         public IEnumerable<IExcelReportColumn> Columns { get; set; }
 
         /// <summary>
+        /// list of header rows
+        /// </summary>
+        public IEnumerable<IExcelReportHeader> Headers { get; set; }
+
+        /// <summary>
         /// default properties for excel sheet
         /// </summary>
         public IExcelReportProperties DefaultProperties { get; set; }
