@@ -3,26 +3,30 @@
 namespace ExcelReportGenerator.ColumnarReport
 {
     /// <summary>
-    /// General class for excel styles
+    /// default styles for sheet
     /// </summary>
-    public interface IExcelReportStyle
+    public interface IExcelReportStyle:IExcelStyle
     {
         /// <summary>
-        /// font style including name,size,color, alignment,...
+        /// default height for all rows
         /// </summary>
-        public IExcelFontStyle? FontStyle { get; set; }
+        public double? DefaultRowHeight { get; set; }
 
         /// <summary>
-        /// border style including color and style for every side
+        /// default width for all columns
         /// </summary>
-        public IExcelBorderStyle? BorderStyle { get; set; }
+        public double?  DefaultColumnWidth { get; set; }
 
         /// <summary>
-        /// background style including pattern and color
+        /// a collection of colors to use for a striped background color pattern for rows
+        /// for example if you use [white,gray] as pallet, rows will be white and gray one after another
         /// </summary>
-        public IExcelBackgroundStyle? BackgroundStyle { get; set; }
+        public string[]? RowsColorPallet { get; set; }
 
+        /// <summary>
+        /// a collection of colors to use for a striped background color pattern for columns
+        /// for example if you use [white,gray] as pallet, columns will be white and gray one after another
+        /// </summary>
+        public string[]? ColumnsColorPallet { get; set; }
     }
-
-
 }

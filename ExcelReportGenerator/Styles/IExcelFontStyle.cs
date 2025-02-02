@@ -10,27 +10,27 @@ namespace ExcelReportGenerator.Styles
         /// <summary>
         /// font name
         /// </summary>
-        public string? FontName { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// font size
         /// </summary>
-        public float? FontSize { get; set; }
+        public float? Size { get; set; }
 
         /// <summary>
         /// should font be bold
         /// </summary>
-        public bool FontBold { get; set; }
+        public bool Bold { get; set; }
 
         /// <summary>
         /// should fond be italic
         /// </summary>
-        public bool FontItalic { get; set; }
+        public bool Italic { get; set; }
 
         /// <summary>
         /// should font be underlined
         /// </summary>
-        public bool FontUnderLine { get; set; }
+        public bool UnderLine { get; set; }
 
         /// <summary>
         /// font color - can be in one of these forms:
@@ -39,7 +39,7 @@ namespace ExcelReportGenerator.Styles
         /// example3 : rbg(0,0,0)
         /// example4 : rgba(0,0,0,1)
         /// </summary>
-        public string? FontColor { get; set; }
+        public string? Color { get; set; }
 
         /// <summary>
         /// horizontal alignment

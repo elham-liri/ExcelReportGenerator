@@ -19,12 +19,12 @@ namespace ExcelReportGenerator.Styles
         /// example3 : rbg(0,0,0)
         /// example4 : rgba(0,0,0,1)
         /// </summary>
-        public string? BorderAroundColor { get; set; }
+        public string? AroundColor { get; set; }
 
         /// <summary>
         /// border style for all sides
         /// </summary>
-        public ExcelBorderStyle? BorderAroundStyle { get; set; }
+        public ExcelBorderStyle? AroundStyle { get; set; }
 
         /// <summary>
         /// border color for top border- can be in one of these forms:
@@ -33,12 +33,12 @@ namespace ExcelReportGenerator.Styles
         /// example3 : rbg(0,0,0)
         /// example4 : rgba(0,0,0,1)
         /// </summary>
-        public string? BorderTopColor { get; set; }
+        public string? TopColor { get; set; }
         
         /// <summary>
         /// border style for top border
         /// </summary>
-        public ExcelBorderStyle? BorderTopStyle { get; set; }
+        public ExcelBorderStyle? TopStyle { get; set; }
 
         /// <summary>
         /// border color for left border- can be in one of these forms:
@@ -47,12 +47,12 @@ namespace ExcelReportGenerator.Styles
         /// example3 : rbg(0,0,0)
         /// example4 : rgba(0,0,0,1)
         /// </summary>
-        public string? BorderLeftColor { get; set; }
+        public string? LeftColor { get; set; }
 
         /// <summary>
         /// border style for left border
         /// </summary>
-        public ExcelBorderStyle? BorderLeftStyle { get; set; }
+        public ExcelBorderStyle? LeftStyle { get; set; }
 
         /// <summary>
         /// border color for bottom border- can be in one of these forms:
@@ -61,12 +61,12 @@ namespace ExcelReportGenerator.Styles
         /// example3 : rbg(0,0,0)
         /// example4 : rgba(0,0,0,1)
         /// </summary>
-        public string? BorderBottomColor { get; set; }
+        public string? BottomColor { get; set; }
 
         /// <summary>
         /// border style for bottom border
         /// </summary>
-        public ExcelBorderStyle? BorderBottomStyle { get; set; }
+        public ExcelBorderStyle? BottomStyle { get; set; }
 
         /// <summary>
         /// border color for right border- can be in one of these forms:
@@ -75,12 +75,12 @@ namespace ExcelReportGenerator.Styles
         /// example3 : rbg(0,0,0)
         /// example4 : rgba(0,0,0,1)
         /// </summary>
-        public string? BorderRightColor { get; set; }
+        public string? RightColor { get; set; }
 
         /// <summary>
         /// border style for right border
         /// </summary>
-        public ExcelBorderStyle? BorderRightStyle { get; set; }
+        public ExcelBorderStyle? RightStyle { get; set; }
 
     }
 }

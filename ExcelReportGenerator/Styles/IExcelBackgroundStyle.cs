@@ -10,7 +10,7 @@ namespace ExcelReportGenerator.Styles
         /// <summary>
         /// fill pattern
         /// </summary>
-        public ExcelFillStyle? BackgroundStyle { get; set; }
+        public ExcelFillStyle? Style { get; set; }
         
         /// <summary>
         /// background color can be in one of these forms:
@@ -19,7 +19,7 @@ namespace ExcelReportGenerator.Styles
         /// example3 : rbg(0,0,0)
         /// example4 : rgba(0,0,0,1)
         /// </summary>
-        public string? BackgroundColor { get; set; }
+        public string? Color { get; set; }
 
     }
 }

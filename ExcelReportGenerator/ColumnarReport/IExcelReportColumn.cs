@@ -1,7 +1,7 @@
 ﻿namespace ExcelReportGenerator.ColumnarReport
 {
     /// <summary>
-    /// Use it to define a report column
+    /// define a report column
     /// </summary>
     public interface IExcelReportColumn
     {
