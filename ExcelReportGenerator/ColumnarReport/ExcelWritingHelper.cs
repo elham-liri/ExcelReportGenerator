@@ -1,4 +1,7 @@
-﻿using OfficeOpenXml;
+﻿using ExcelReportGenerator.Styles;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using System.Drawing;
 
 namespace ExcelReportGenerator.ColumnarReport
 {
@@ -99,6 +102,147 @@ namespace ExcelReportGenerator.ColumnarReport
             }
 
             return sheet;
+        }
+
+
+        public static ExcelWorksheet SetDefaultSheetStyle(this ExcelWorksheet sheet, IExcelReportProfile reportProfile, int dataSetCount)
+        {
+            var rows = reportProfile.GetFinalRowsCount(dataSetCount);
+            var cols = reportProfile.GetVerticalColumnsCount();
+
+             sheet.Cells[1, rows, 1, cols]
+                .SetFontStyle(reportProfile.DefaultStyle.FontStyle)
+                .SetBackgroundStyle(reportProfile.DefaultStyle.BackgroundStyle)
+                .SetBorderStyle(reportProfile.DefaultStyle.BorderStyle);
+
+            return sheet;
+        }
+
+        public static ExcelRange SetFontStyle(this ExcelRange range, IExcelFontStyle? fontStyle)
+        {
+            if (fontStyle == null) return range;
+
+            if (!string.IsNullOrWhiteSpace(fontStyle.Name))
+                range.Style.Font.Name = fontStyle.Name;
+
+            if(fontStyle.Size.HasValue && fontStyle.Size>0)
+                range.Style.Font.Size = fontStyle.Size.Value;
+
+            range.Style.Font.Bold=fontStyle.Bold;
+            range.Style.Font.Italic=fontStyle.Italic;
+            range.Style.Font.UnderLine=fontStyle.UnderLine;
+
+            if (!string.IsNullOrWhiteSpace(fontStyle.Color))
+                range.Style.Font.Color.SetColor(GetColor(fontStyle.Color));
+
+            if(fontStyle.HorizontalAlignment.HasValue)
+                range.Style.HorizontalAlignment=fontStyle.HorizontalAlignment.Value;
+
+            if(fontStyle.VerticalAlignment.HasValue)
+                range.Style.VerticalAlignment=fontStyle.VerticalAlignment.Value;
+
+            return range;
+        }
+
+        public static ExcelRange SetBackgroundStyle(this ExcelRange range, IExcelBackgroundStyle? backgroundStyle)
+        {
+            if(backgroundStyle==null) return range;
+
+            if (backgroundStyle.Style.HasValue)
+                range.Style.Fill.PatternType = backgroundStyle.Style.Value;
+
+            if (!string.IsNullOrWhiteSpace(backgroundStyle.Color))
+                range.Style.Fill.BackgroundColor.SetColor(GetColor(backgroundStyle.Color));
+
+            return range;
+        }
+
+        public static ExcelRange SetBorderStyle(this ExcelRange range, IExcelBorderStyle? borderStyle)
+        {
+            if(borderStyle==null) return range;
+
+            if (borderStyle.BorderAround)
+            {
+                if (borderStyle.AroundStyle == null) return range;
+
+                if (string.IsNullOrWhiteSpace(borderStyle.AroundColor))
+                    range.Style.Border.BorderAround(borderStyle.AroundStyle.Value);
+                else
+                    range.Style.Border.BorderAround(borderStyle.AroundStyle.Value, GetColor(borderStyle.AroundColor));
+
+                return range;
+            }
+
+            if (borderStyle.TopStyle.HasValue)
+            {
+                range.Style.Border.Top.Style=borderStyle.TopStyle.Value;
+
+                if (!string.IsNullOrWhiteSpace(borderStyle.TopColor))
+                    range.Style.Border.Top.Color.SetColor(GetColor(borderStyle.TopColor));
+            }
+
+            if (borderStyle.LeftStyle.HasValue)
+            {
+                range.Style.Border.Left.Style = borderStyle.LeftStyle.Value;
+
+                if (!string.IsNullOrWhiteSpace(borderStyle.LeftColor))
+                    range.Style.Border.Left.Color.SetColor(GetColor(borderStyle.LeftColor));
+            }
+
+            if (borderStyle.BottomStyle.HasValue)
+            {
+                range.Style.Border.Bottom.Style = borderStyle.BottomStyle.Value;
+
+                if (!string.IsNullOrWhiteSpace(borderStyle.BottomColor))
+                    range.Style.Border.Bottom.Color.SetColor(GetColor(borderStyle.BottomColor));
+            }
+
+            if (borderStyle.RightStyle.HasValue)
+            {
+                range.Style.Border.Right.Style = borderStyle.RightStyle.Value;
+
+                if (!string.IsNullOrWhiteSpace(borderStyle.RightColor))
+                    range.Style.Border.Right.Color.SetColor(GetColor(borderStyle.RightColor));
+            }
+
+            return range;
+        }
+
+        public static Color GetColor(this string code)
+        {
+            if (code.Contains("rgba"))
+            {
+                code = code.Replace("rgba", string.Empty).Replace("(", string.Empty).Replace(")", string.Empty);
+                var rgba = code.Split(',');
+                rgba[3] = rgba[3].Contains("0.") ? rgba[3].Replace("0.", string.Empty) : rgba[3];
+                return Color.FromArgb(int.Parse(rgba[3]), int.Parse(rgba[0]), int.Parse(rgba[1]), int.Parse(rgba[2]));
+            }
+
+            if (code.Contains("rgb"))
+            {
+                code = code.Replace("rgb", string.Empty).Replace("(", string.Empty).Replace(")", string.Empty);
+                var rgb = code.Split(',');
+                return Color.FromArgb(int.Parse(rgb[0]), int.Parse(rgb[1]), int.Parse(rgb[2]));
+            }
+            return System.Drawing.ColorTranslator.FromHtml(code);
+        }
+
+
+
+
+        public static int GetVerticalColumnsCount(this IExcelReportProfile profile)
+        {
+            return profile.Columns.Count(a => !a.IsHorizontal);
+        }
+
+        public static int GetFinalRowsCount(this IExcelReportProfile profile, int dataSetCount)
+        {
+            var finalRow = dataSetCount + profile.Headers.Count(a => !a.Disabled);
+            finalRow += dataSetCount * profile.Columns.Count(a => a.IsHorizontal);
+
+            if (profile.Columns.Any(a => a.ShowTotalSum)) finalRow += 1;
+
+            return finalRow;
         }
 
     }

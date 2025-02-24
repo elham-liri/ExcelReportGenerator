@@ -18,9 +18,9 @@ namespace ExcelReportGenerator.ColumnarReport
         public int Order { get; set; }
 
         /// <summary>
-        /// header row style; will overwrite columnStyle
+        /// header row style; will overwrite defaultStyle and columnStyle
         /// </summary>
-        public IExcelStyle Style { get; set; }  
+        public IExcelReportHeaderStyle Style { get; set; }  
 
         /// <summary>
         /// if true header will be built upon columns
