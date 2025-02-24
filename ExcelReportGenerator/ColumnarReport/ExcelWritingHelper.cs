@@ -79,7 +79,7 @@ namespace ExcelReportGenerator.ColumnarReport
         {
             var verticalColumns = columns.Where(a => !a.IsHorizontal).OrderBy(a => a.Order).ToList();
             var colsCount = verticalColumns.Count;
-           
+
             using var range = sheet.Cells[rowNumber, 1, rowNumber, colsCount];
             for (var i = 0; i < colsCount; i++)
             {
@@ -95,7 +95,7 @@ namespace ExcelReportGenerator.ColumnarReport
             var columnNumber = 1;
             foreach (var headerPart in header.HeaderParts)
             {
-                var range = sheet.Cells[rowNumber, columnNumber, rowNumber, columnNumber + headerPart.Colspan -1];
+                var range = sheet.Cells[rowNumber, columnNumber, rowNumber, columnNumber + headerPart.Colspan - 1];
                 range.Value = headerPart.Value;
 
                 columnNumber += headerPart.Colspan;
@@ -110,10 +110,17 @@ namespace ExcelReportGenerator.ColumnarReport
             var rows = reportProfile.GetFinalRowsCount(dataSetCount);
             var cols = reportProfile.GetVerticalColumnsCount();
 
-             sheet.Cells[1, rows, 1, cols]
+            sheet
+                .SetDefaultHeightForRows(rows, reportProfile.DefaultStyle.DefaultRowHeight)
+                .SetDefaultWidthForColumns(cols, reportProfile.DefaultStyle.DefaultColumnWidth)
+                .ApplyRowColorPallet()
+                .ApplyColumnColorPallet()
+                .Cells[1, rows, 1, cols]
                 .SetFontStyle(reportProfile.DefaultStyle.FontStyle)
                 .SetBackgroundStyle(reportProfile.DefaultStyle.BackgroundStyle)
                 .SetBorderStyle(reportProfile.DefaultStyle.BorderStyle);
+
+
 
             return sheet;
         }
@@ -125,28 +132,28 @@ namespace ExcelReportGenerator.ColumnarReport
             if (!string.IsNullOrWhiteSpace(fontStyle.Name))
                 range.Style.Font.Name = fontStyle.Name;
 
-            if(fontStyle.Size.HasValue && fontStyle.Size>0)
+            if (fontStyle.Size.HasValue && fontStyle.Size > 0)
                 range.Style.Font.Size = fontStyle.Size.Value;
 
-            range.Style.Font.Bold=fontStyle.Bold;
-            range.Style.Font.Italic=fontStyle.Italic;
-            range.Style.Font.UnderLine=fontStyle.UnderLine;
+            range.Style.Font.Bold = fontStyle.Bold;
+            range.Style.Font.Italic = fontStyle.Italic;
+            range.Style.Font.UnderLine = fontStyle.UnderLine;
 
             if (!string.IsNullOrWhiteSpace(fontStyle.Color))
                 range.Style.Font.Color.SetColor(GetColor(fontStyle.Color));
 
-            if(fontStyle.HorizontalAlignment.HasValue)
-                range.Style.HorizontalAlignment=fontStyle.HorizontalAlignment.Value;
+            if (fontStyle.HorizontalAlignment.HasValue)
+                range.Style.HorizontalAlignment = fontStyle.HorizontalAlignment.Value;
 
-            if(fontStyle.VerticalAlignment.HasValue)
-                range.Style.VerticalAlignment=fontStyle.VerticalAlignment.Value;
+            if (fontStyle.VerticalAlignment.HasValue)
+                range.Style.VerticalAlignment = fontStyle.VerticalAlignment.Value;
 
             return range;
         }
 
         public static ExcelRange SetBackgroundStyle(this ExcelRange range, IExcelBackgroundStyle? backgroundStyle)
         {
-            if(backgroundStyle==null) return range;
+            if (backgroundStyle == null) return range;
 
             if (backgroundStyle.Style.HasValue)
                 range.Style.Fill.PatternType = backgroundStyle.Style.Value;
@@ -159,7 +166,7 @@ namespace ExcelReportGenerator.ColumnarReport
 
         public static ExcelRange SetBorderStyle(this ExcelRange range, IExcelBorderStyle? borderStyle)
         {
-            if(borderStyle==null) return range;
+            if (borderStyle == null) return range;
 
             if (borderStyle.BorderAround)
             {
@@ -175,7 +182,7 @@ namespace ExcelReportGenerator.ColumnarReport
 
             if (borderStyle.TopStyle.HasValue)
             {
-                range.Style.Border.Top.Style=borderStyle.TopStyle.Value;
+                range.Style.Border.Top.Style = borderStyle.TopStyle.Value;
 
                 if (!string.IsNullOrWhiteSpace(borderStyle.TopColor))
                     range.Style.Border.Top.Color.SetColor(GetColor(borderStyle.TopColor));
@@ -206,6 +213,41 @@ namespace ExcelReportGenerator.ColumnarReport
             }
 
             return range;
+        }
+
+        public static ExcelWorksheet SetDefaultHeightForRows(this ExcelWorksheet sheet, int rows, double? defaultHeight)
+        {
+            if (defaultHeight is not > 0) return sheet;
+
+            for (var i = 0; i < rows; i++)
+            {
+                sheet.Row(i + 1).Height = defaultHeight.Value;
+            }
+
+            return sheet;
+        }
+
+        public static ExcelWorksheet SetDefaultWidthForColumns(this ExcelWorksheet sheet, int cols, double? defaultWidth)
+        {
+            if (defaultWidth is not > 0) return sheet;
+
+            for (int i = 0; i < cols; i++)
+            {
+                sheet.Column(i + 1).Width = defaultWidth.Value;
+            }
+
+            return sheet; }
+
+        public static ExcelWorksheet ApplyRowColorPallet(this ExcelWorksheet sheet)
+        {
+            //TODO
+            return sheet;
+        }
+
+        public static ExcelWorksheet ApplyColumnColorPallet(this ExcelWorksheet sheet)
+        {
+            //TODO
+            return sheet;
         }
 
         public static Color GetColor(this string code)
