@@ -3,7 +3,7 @@
     /// <summary>
     /// define a header part
     /// </summary>
-    public interface IExcelHeaderPart
+    public interface IExcelReportHeaderPart
     {
         /// <summary>
         /// order of header part

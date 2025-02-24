@@ -36,7 +36,7 @@
         public bool AllowSelectLockedCells { get; set; }
 
         /// <summary>
-        /// count of columns that should be frozen from left
+        /// count of columns that should be frozen from left (in ltr sheet) or right (in rtl sheet)
         /// </summary>
         public int FrozenColumns { get; set; }
 

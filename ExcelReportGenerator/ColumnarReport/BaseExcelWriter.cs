@@ -12,8 +12,8 @@ namespace ExcelReportGenerator.ColumnarReport
 
         public virtual bool CellValueIsNumber(object value)
         {
-            return value != null 
-                   && !string.IsNullOrEmpty(value.ToString()) 
+            return value != null
+                   && !string.IsNullOrEmpty(value.ToString())
                    && Regex.IsMatch(value.ToString()!, @"^-?\d+(?:\.\d+)?$");
         }
 
@@ -22,23 +22,26 @@ namespace ExcelReportGenerator.ColumnarReport
         public abstract string PrepareDateTimeValueToShow(object value);
 
 
-        public virtual IEnumerable<IEnumerable<(int order, object? value)>> PrepareExcelRows<T>(IEnumerable<T> dataSource,
-            IEnumerable<IExcelReportColumn> columns) where T : class, IExcelData
+        public virtual IEnumerable<TR> PrepareExcelRows<T, TR, TM>(IEnumerable<T> dataSource,
+            IEnumerable<IExcelReportColumn> columns)
+            where T : class, IExcelData
+            where TR : class, IReportRow<TM>, new()
+            where TM : class, IReportCell, new()
         {
-            var rows = new List<IEnumerable<(int order, object? value)>>();
+            var rows = new List<TR>();
             var type = typeof(T);
 
             var normalColumns = columns.Where(a => !a.NeedsCalculation).OrderBy(a => a.Order).ToList();
 
             foreach (var dataRow in dataSource)
             {
-                var row = new List<(int order, object? value)>();
+                var row = new TR() { Cells = new List<TM>() };
                 foreach (var column in normalColumns)
                 {
                     var property = type.GetProperty(FirstCharToUpper(column.SourceName));
                     if (property == null)
                     {
-                        row.Add((column.Order, string.Empty));
+                        row.Cells.Add(new TM() { Order = column.Order, Value = string.Empty });
                         continue;
                     }
 
@@ -58,20 +61,25 @@ namespace ExcelReportGenerator.ColumnarReport
                         value = PrepareNumberValueToShow(value);
                     }
 
-                    row.Add((column.Order,value));
+                    row.Cells.Add(new TM() { Order = column.Order, Value = value });
                 }
+
                 rows.Add(row);
             }
+
             return rows;
         }
 
-        public virtual byte[] GenerateExcelFileBytes(IEnumerable<IEnumerable<(int order, object? value)>> excelRows,
+        public virtual byte[] GenerateExcelFileBytes<T, TC>(IEnumerable<T> excelRows,
             IExcelReportProfile excelProfile, string sheetName)
+            where T : class, IReportRow<TC>, new()
+            where TC : class, IReportCell, new()
         {
             using var package = new ExcelPackage();
             var sheet = package
                 .CreateSheet(sheetName)
-                .SetSheetDefaultProperties(excelProfile.DefaultProperties);
+                .SetSheetDefaultProperties(excelProfile.DefaultProperties)
+                .AddHeaderRows(excelProfile.Headers,excelProfile.Columns);
 
             return package.GetAsByteArray();
 

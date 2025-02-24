@@ -30,6 +30,6 @@ namespace ExcelReportGenerator.ColumnarReport
         /// <summary>
         /// if ColumnBased=false then header will be built upon these parts
         /// </summary>
-        public IEnumerable<IExcelHeaderPart> HeaderParts { get; set; }
+        public IEnumerable<IExcelReportHeaderPart> HeaderParts { get; set; }
     }
 }
